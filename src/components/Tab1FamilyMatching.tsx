@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { 
   Users, 
   Sparkles, 
@@ -6,16 +6,17 @@ import {
   MessageSquare, 
   Search, 
   CheckCircle2, 
-  SlidersHorizontal,
-  Edit3
+  Edit3,
+  UserCheck,
+  ShieldCheck
 } from "lucide-react";
 import { 
   FamilyProfile, 
   MatchedFamily, 
-  AgeRange, 
   SupportNeed 
 } from "../types";
 import { sampleMatchedFamilies } from "../data/mockData";
+import { subscribeToUserProfilesFromFirestore } from "../lib/firebase";
 
 interface Tab1Props {
   userProfile: FamilyProfile;
@@ -40,14 +41,93 @@ export const Tab1FamilyMatching: React.FC<Tab1Props> = ({
   onOpenProfileModal,
   sensoryMode
 }) => {
+  // Registered user profiles from Firestore
+  const [registeredProfiles, setRegisteredProfiles] = useState<FamilyProfile[]>([]);
+
   // Filters state
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [ageFilter, setAgeFilter] = useState<string>("All");
   const [needFilter, setNeedFilter] = useState<string>("All");
 
-  // Recalculate match scores based on userProfile
+  // Subscribe to registered profiles in Firestore
+  useEffect(() => {
+    const unsubscribe = subscribeToUserProfilesFromFirestore((profiles) => {
+      setRegisteredProfiles(profiles);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Recalculate match scores & merge registered Firestore families + default sample families
   const matchedFamilies = useMemo(() => {
-    const recalculated = sampleMatchedFamilies.map((fam) => {
+    const normUserEmail = userProfile.email?.toLowerCase().trim();
+    const normUserName = userProfile.parentName?.toLowerCase().trim();
+
+    // Deduplicate registered profiles and exclude current user + guests
+    const registeredFamiliesList: MatchedFamily[] = [];
+    const seenKeys = new Set<string>();
+
+    registeredProfiles.forEach((p) => {
+      if (!p.id) return;
+
+      const normPEmail = p.email?.toLowerCase().trim();
+      const normPName = p.parentName?.toLowerCase().trim();
+
+      // Exclude self (match by ID, Email, or Parent Name)
+      if (p.id === userProfile.id) return;
+      if (normUserEmail && normPEmail && normUserEmail === normPEmail) return;
+      if (normUserName && normPName && normUserName === normPName) return;
+
+      // Exclude Guest profiles
+      if (
+        p.id.startsWith("guest_") ||
+        normPEmail === "guest@sukoon.app" ||
+        normPName?.includes("guest")
+      ) {
+        return;
+      }
+
+      // Deduplicate multiple profile documents for the same user
+      const dedupKey = normPEmail || normPName || p.id;
+      if (seenKeys.has(dedupKey)) return;
+      seenKeys.add(dedupKey);
+
+      registeredFamiliesList.push({
+        id: p.id,
+        familyTitle: `${p.parentName || "Sukoon"}'s Family`,
+        parentNames: p.parentName || "Caregiver",
+        childAge: p.childAge || "6-9",
+        supportNeeds: p.supportNeeds || [],
+        nearbyMosque: p.nearbyMosque || "Local Mosque",
+        distance: p.cityRegion || "Community Member",
+        preferredMode: p.commMode || "In-person / Chat",
+        bio: `Registered Sukoon Community Member in ${p.cityRegion || "Local Area"}. Languages spoken: ${(p.languages || ["English"]).join(", ")}.`,
+        matchScore: 90,
+        matchingCriteria: [
+          "Registered Sukoon Member",
+          `Attends ${p.nearbyMosque || "Local Mosque"}`
+        ],
+        avatarInitials: (p.parentName || "F").charAt(0).toUpperCase(),
+        bgGradient: "from-[#3A5D54] to-[#5A8B7D]",
+        interests: p.interests || []
+      });
+    });
+
+    // Combine registered families + sample families, eliminating duplicate IDs, guest profiles, and self-matches
+    const allCombined = [...registeredFamiliesList];
+    sampleMatchedFamilies.forEach((sample) => {
+      const sampleNameNorm = sample.parentNames?.toLowerCase().trim();
+      const sampleTitleNorm = sample.familyTitle?.toLowerCase().trim();
+
+      const isGuest = sample.id.startsWith("guest_") || sampleNameNorm?.includes("guest") || sampleTitleNorm?.includes("guest");
+      const isSelf = (normUserName && (sampleNameNorm?.includes(normUserName) || sampleTitleNorm?.includes(normUserName)));
+      const isDuplicate = allCombined.some((f) => f.id === sample.id || f.parentNames?.toLowerCase().trim() === sampleNameNorm);
+
+      if (!isGuest && !isSelf && !isDuplicate) {
+        allCombined.push(sample);
+      }
+    });
+
+    const recalculated = allCombined.map((fam) => {
       let score = 65;
       const criteria: string[] = [];
 
@@ -77,6 +157,12 @@ export const Tab1FamilyMatching: React.FC<Tab1Props> = ({
         criteria.push(`Matches ${sharedInts.length} shared interests`);
       }
 
+      // Extra bonus if this is a real registered user account
+      if (fam.matchingCriteria.includes("Registered Sukoon Member")) {
+        score += 10;
+        criteria.unshift("Registered Member (Live User)");
+      }
+
       const finalScore = Math.min(Math.max(score, 65), 99);
 
       return {
@@ -88,7 +174,7 @@ export const Tab1FamilyMatching: React.FC<Tab1Props> = ({
 
     recalculated.sort((a, b) => b.matchScore - a.matchScore);
     return recalculated;
-  }, [userProfile]);
+  }, [userProfile, registeredProfiles]);
 
   // Filtered families
   const filteredFamilies = useMemo(() => {
@@ -117,10 +203,10 @@ export const Tab1FamilyMatching: React.FC<Tab1Props> = ({
             <span>Smart Compatible Family Matchmaker</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-[#3A5D54] tracking-tight">
-            Find Compatible Local Muslim Families
+            Find & Message Compatible Local Muslim Families
           </h2>
           <p className={`text-xs sm:text-sm text-stone-600 leading-relaxed ${sensoryMode ? "leading-loose" : ""}`}>
-            Connecting with families who share your child's age, sensory needs, and local mosque community.
+            View real registered community members and nearby families. Click "Connect / Send Message" to start direct real-time chats!
           </p>
         </div>
 
@@ -134,7 +220,7 @@ export const Tab1FamilyMatching: React.FC<Tab1Props> = ({
           </div>
           <button
             onClick={onOpenProfileModal}
-            className="w-full bg-[#5A8B7D] hover:bg-[#4a7569] text-white text-xs font-semibold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm"
+            className="w-full bg-[#5A8B7D] hover:bg-[#4a7569] text-white text-xs font-semibold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5 text-amber-200" />
             <span>Edit Match Criteria in Profile</span>
@@ -205,6 +291,11 @@ export const Tab1FamilyMatching: React.FC<Tab1Props> = ({
               {filteredFamilies.length} Available
             </span>
           </div>
+
+          <span className="text-xs text-stone-500 font-medium hidden sm:inline-flex items-center gap-1">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#5A8B7D]" />
+            Real-time Messaging Active
+          </span>
         </div>
 
         {filteredFamilies.length === 0 ? (
@@ -220,95 +311,107 @@ export const Tab1FamilyMatching: React.FC<Tab1Props> = ({
                 setAgeFilter("All");
                 setNeedFilter("All");
               }}
-              className="mt-2 bg-[#5A8B7D] text-white text-xs font-semibold px-4 py-2 rounded-xl"
+              className="mt-2 bg-[#5A8B7D] text-white text-xs font-semibold px-4 py-2 rounded-xl cursor-pointer"
             >
               Reset Filters
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {filteredFamilies.map((fam) => (
-              <div
-                key={fam.id}
-                className="glass-card rounded-[28px] p-6 shadow-md hover:shadow-lg transition-all duration-200 space-y-4 flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  {/* Header with match badge */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${fam.bgGradient} text-white font-bold flex items-center justify-center text-sm shadow-md`}>
-                        {fam.avatarInitials}
+            {filteredFamilies.map((fam) => {
+              const isRegisteredLiveUser = fam.matchingCriteria.includes("Registered Member (Live User)");
+              return (
+                <div
+                  key={fam.id}
+                  className={`glass-card rounded-[28px] p-6 shadow-md hover:shadow-lg transition-all duration-200 space-y-4 flex flex-col justify-between ${
+                    isRegisteredLiveUser ? "border-2 border-[#5A8B7D]/40 bg-emerald-50/30" : ""
+                  }`}
+                >
+                  <div className="space-y-3">
+                    {/* Header with match badge */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${fam.bgGradient} text-white font-bold flex items-center justify-center text-sm shadow-md`}>
+                          {fam.avatarInitials}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-base font-bold text-stone-800">
+                              {fam.familyTitle}
+                            </h4>
+                            {isRegisteredLiveUser && (
+                              <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                                <UserCheck className="w-3 h-3 text-emerald-600" />
+                                Registered
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-stone-500">
+                            Parents: {fam.parentNames} • {fam.distance}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-base font-bold text-stone-800">
-                          {fam.familyTitle}
-                        </h4>
-                        <p className="text-xs text-stone-500">
-                          Parents: {fam.parentNames} • {fam.distance}
-                        </p>
+
+                      <div className="bg-[#E9C46A]/20 text-[#937217] text-xs font-bold px-3 py-1 rounded-full border border-[#E9C46A]/40 shrink-0">
+                        {fam.matchScore}% Match
                       </div>
                     </div>
 
-                    <div className="bg-[#E9C46A]/20 text-[#937217] text-xs font-bold px-3 py-1 rounded-full border border-[#E9C46A]/40 shrink-0">
-                      {fam.matchScore}% Match
+                    {/* Mosque & Age Info */}
+                    <div className="bg-stone-100/50 rounded-2xl p-3 text-xs text-stone-700 space-y-1">
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <MapPin className="w-3.5 h-3.5 text-[#5A8B7D]" />
+                        <span>Attends: <strong>{fam.nearbyMosque}</strong></span>
+                      </div>
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <Users className="w-3.5 h-3.5 text-[#937217]" />
+                        <span>Child: <strong>{fam.childAge}</strong></span>
+                      </div>
+                    </div>
+
+                    {/* Bio */}
+                    <p className="text-xs text-stone-600 leading-relaxed italic bg-white/60 p-3 rounded-2xl border border-white/80">
+                      "{fam.bio}"
+                    </p>
+
+                    {/* Matching Criteria Badges */}
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
+                        Shared Compatibility Factors:
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {fam.matchingCriteria.map((crit, idx) => (
+                          <span
+                            key={idx}
+                            className="bg-[#5A8B7D]/10 text-[#3A5D54] text-[11px] font-medium px-2.5 py-1 rounded-full border border-[#5A8B7D]/20 flex items-center gap-1"
+                          >
+                            <CheckCircle2 className="w-3 h-3 text-[#5A8B7D] shrink-0" />
+                            <span>{crit}</span>
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Mosque & Age Info */}
-                  <div className="bg-stone-100/50 rounded-2xl p-3 text-xs text-stone-700 space-y-1">
-                    <div className="flex items-center gap-1.5 font-medium">
-                      <MapPin className="w-3.5 h-3.5 text-[#5A8B7D]" />
-                      <span>Attends: <strong>{fam.nearbyMosque}</strong></span>
-                    </div>
-                    <div className="flex items-center gap-1.5 font-medium">
-                      <Users className="w-3.5 h-3.5 text-[#937217]" />
-                      <span>Child: <strong>{fam.childAge}</strong></span>
-                    </div>
-                  </div>
-
-                  {/* Bio */}
-                  <p className="text-xs text-stone-600 leading-relaxed italic bg-white/60 p-3 rounded-2xl border border-white/80">
-                    "{fam.bio}"
-                  </p>
-
-                  {/* Matching Criteria Badges */}
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
-                      Shared Compatibility Factors:
+                  {/* Action Button */}
+                  <div className="pt-2 border-t border-stone-200/50 flex items-center justify-between">
+                    <span className="text-[11px] text-stone-500">
+                      Prefers: <strong>{fam.preferredMode}</strong>
                     </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {fam.matchingCriteria.map((crit, idx) => (
-                        <span
-                          key={idx}
-                          className="bg-[#5A8B7D]/10 text-[#3A5D54] text-[11px] font-medium px-2.5 py-1 rounded-full border border-[#5A8B7D]/20 flex items-center gap-1"
-                        >
-                          <CheckCircle2 className="w-3 h-3 text-[#5A8B7D] shrink-0" />
-                          <span>{crit}</span>
-                        </span>
-                      ))}
-                    </div>
+                    <button
+                      onClick={() => onOpenConnectModal(fam)}
+                      className="bg-[#5A8B7D] hover:bg-[#4a7569] text-white text-xs font-semibold px-4 py-2 rounded-2xl flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Connect / Send Message</span>
+                    </button>
                   </div>
                 </div>
-
-                {/* Action Button */}
-                <div className="pt-2 border-t border-stone-200/50 flex items-center justify-between">
-                  <span className="text-[11px] text-stone-500">
-                    Prefers: <strong>{fam.preferredMode}</strong>
-                  </span>
-                  <button
-                    onClick={() => onOpenConnectModal(fam)}
-                    className="bg-[#5A8B7D] hover:bg-[#4a7569] text-white text-xs font-semibold px-4 py-2 rounded-2xl flex items-center gap-1.5 transition-all shadow-sm"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Connect / Send Message</span>
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
     </div>
   );
 };
-

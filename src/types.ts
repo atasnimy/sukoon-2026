@@ -13,6 +13,8 @@ export type CommMode = "Chat" | "Email" | "Video";
 
 export interface FamilyProfile {
   id: string;
+  email?: string;
+  role?: "admin" | "user";
   parentName: string;
   childAge: AgeRange;
   supportNeeds: SupportNeed[];

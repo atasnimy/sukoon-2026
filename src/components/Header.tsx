@@ -10,9 +10,15 @@ import {
   UserCheck,
   Menu,
   X,
-  Home
+  Home,
+  User as UserIcon,
+  LogIn,
+  LogOut,
+  Lock,
+  MessageSquare
 } from "lucide-react";
 import { FamilyProfile } from "../types";
+import { CustomAuthUser, logoutUser } from "../lib/firebase";
 
 interface HeaderProps {
   activeTab: number;
@@ -21,6 +27,10 @@ interface HeaderProps {
   sensoryMode: boolean;
   setSensoryMode: (val: boolean | ((prev: boolean) => boolean)) => void;
   onOpenProfileModal: () => void;
+  currentUser: CustomAuthUser | null;
+  onOpenAuthModal: () => void;
+  unreadCount?: number;
+  onRequireAuthForTab?: (tabLabel: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -29,7 +39,11 @@ export const Header: React.FC<HeaderProps> = ({
   userProfile,
   sensoryMode,
   setSensoryMode,
-  onOpenProfileModal
+  onOpenProfileModal,
+  currentUser,
+  onOpenAuthModal,
+  unreadCount = 0,
+  onRequireAuthForTab
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -42,7 +56,35 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   const handleSelectTab = (tabId: number) => {
+    if (tabId > 0 && !currentUser) {
+      setIsMenuOpen(false);
+      if (onRequireAuthForTab) {
+        const item = navItems.find((n) => n.id === tabId);
+        onRequireAuthForTab(item ? item.label : "this feature");
+      } else {
+        onOpenAuthModal();
+      }
+      return;
+    }
+
     setActiveTab(tabId);
+    setIsMenuOpen(false);
+  };
+
+  const handleProfileClick = () => {
+    if (!currentUser) {
+      if (onRequireAuthForTab) {
+        onRequireAuthForTab("your family profile");
+      } else {
+        onOpenAuthModal();
+      }
+      return;
+    }
+    onOpenProfileModal();
+  };
+
+  const handleSignOutClick = async () => {
+    await logoutUser();
     setIsMenuOpen(false);
   };
 
@@ -57,7 +99,7 @@ export const Header: React.FC<HeaderProps> = ({
         <span className="hidden md:inline-block text-[#5A8B7D]/40">•</span>
         <span className="hidden md:inline-flex items-center gap-1 text-[#3A5D54]">
           <ShieldCheck className="w-3.5 h-3.5 text-[#5A8B7D]" />
-          100% Privacy-Focused
+          Firestore Database Sync Enabled
         </span>
       </div>
 
@@ -83,47 +125,93 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </button>
 
-          {/* Right Section Controls: Hamburger Menu Trigger, Sensory Toggle, Profile */}
-          <div className="flex items-center gap-2.5">
+          {/* Right Section Controls: Auth Sign-In / Sign Out Button, Sensory Toggle, Profile */}
+          <div className="flex items-center gap-2">
+            {/* Sign In / Sign Out Button */}
+            {currentUser ? (
+              <button
+                onClick={handleSignOutClick}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border transition-all cursor-pointer shadow-xs bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100"
+                title="Click to Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5 text-rose-700" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
+            ) : (
+              <button
+                onClick={onOpenAuthModal}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border transition-all cursor-pointer shadow-xs bg-[#E9C46A] hover:bg-[#d9b45a] text-[#3A5D54] border-[#E9C46A] font-bold"
+                title="Sign In or Sign Up"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign In / Up</span>
+              </button>
+            )}
+
+            {/* Sensory Toggle */}
             <button
               onClick={() => setSensoryMode((prev) => !prev)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 border ${
                 sensoryMode
-                  ? "bg-[#E9C46A]/30 text-[#937217] border-[#E9C46A]/60 shadow-sm font-semibold"
+                  ? "bg-[#E9C46A]/30 text-[#937217] border-[#E9C46A]/60 shadow-xs font-semibold"
                   : "bg-white/70 text-stone-600 border-white/80 hover:bg-white hover:text-[#5A8B7D]"
               }`}
               title="Toggle calm sensory-friendly visual style"
             >
               <Eye className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{sensoryMode ? "Sensory: On" : "Sensory View"}</span>
+              <span className="hidden md:inline">{sensoryMode ? "Sensory: On" : "Sensory View"}</span>
             </button>
 
+            {/* Profile Button */}
             <button
-              onClick={onOpenProfileModal}
-              className="bg-white/70 hover:bg-white text-stone-800 border border-white/80 rounded-full px-3 py-1.5 text-xs font-medium flex items-center gap-2 transition-all shadow-sm hover:ring-2 hover:ring-[#5A8B7D]/40 cursor-pointer"
-              title="Click to view & edit your family profile"
+              onClick={handleProfileClick}
+              className="bg-white/80 hover:bg-white text-stone-800 border border-stone-200/80 rounded-full px-3 py-1.5 text-xs font-medium flex items-center gap-2 transition-all shadow-xs hover:ring-2 hover:ring-[#5A8B7D]/40 cursor-pointer"
+              title={currentUser ? "Click to view & edit your family profile" : "Sign in to create or view your profile"}
             >
-              <div className="w-6 h-6 rounded-full bg-[#E9C46A]/30 border border-white flex items-center justify-center text-[#937217] font-bold text-[11px]">
-                {userProfile.parentName.charAt(0) || "F"}
-              </div>
-              <div className="text-left hidden lg:block">
-                <div className="text-[11px] font-bold text-stone-800 leading-none">
-                  {userProfile.parentName}
-                </div>
-                <div className="text-[10px] text-stone-500 leading-none mt-0.5">
-                  Edit Profile ⚙️
-                </div>
-              </div>
+              {currentUser ? (
+                <>
+                  <div className="w-6 h-6 rounded-full bg-[#E9C46A]/40 border border-white flex items-center justify-center text-[#937217] font-extrabold text-[11px]">
+                    {userProfile.parentName.charAt(0) || "U"}
+                  </div>
+                  <div className="text-left hidden lg:block">
+                    <div className="text-[11px] font-bold text-stone-800 leading-none truncate max-w-[100px]">
+                      {userProfile.parentName}
+                    </div>
+                    <div className="text-[10px] text-stone-500 leading-none mt-0.5">
+                      My Profile ⚙️
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="w-6 h-6 rounded-full bg-stone-200/90 border border-stone-300 flex items-center justify-center text-stone-600">
+                    <UserIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="text-left hidden lg:block">
+                    <div className="text-[11px] font-bold text-stone-700 leading-none">
+                      Guest / Account
+                    </div>
+                    <div className="text-[10px] text-stone-500 leading-none mt-0.5">
+                      Sign in required
+                    </div>
+                  </div>
+                </>
+              )}
             </button>
 
             {/* Hamburger Button */}
             <button
               onClick={() => setIsMenuOpen(true)}
-              className="bg-[#5A8B7D] hover:bg-[#4a7569] text-white px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all shadow-md cursor-pointer ml-1"
+              className="bg-[#5A8B7D] hover:bg-[#4a7569] text-white px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all shadow-md cursor-pointer ml-1 relative"
               aria-label="Open Navigation Menu"
             >
               <Menu className="w-4 h-4" />
               <span>Menu</span>
+              {unreadCount > 0 && (
+                <span className="bg-rose-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full animate-pulse shadow-xs">
+                  {unreadCount}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -167,24 +255,47 @@ export const Header: React.FC<HeaderProps> = ({
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
+                  const isLocked = item.id > 0 && !currentUser;
+                  const isFamilyMatch = item.id === 1;
+
                   return (
                     <button
                       key={item.id}
                       onClick={() => handleSelectTab(item.id)}
-                      className={`w-full text-left p-3 rounded-2xl transition-all flex items-start gap-3.5 cursor-pointer ${
+                      className={`w-full text-left p-3 rounded-2xl transition-all flex items-start gap-3.5 cursor-pointer relative ${
                         isActive
                           ? "bg-[#5A8B7D]/10 text-[#3A5D54] font-bold border border-[#5A8B7D]/30"
+                          : isLocked
+                          ? "text-stone-500 hover:bg-stone-50"
                           : "text-stone-700 hover:bg-stone-100 hover:text-stone-900"
                       }`}
                     >
                       <div className={`p-2 rounded-xl mt-0.5 ${
-                        isActive ? "bg-[#5A8B7D] text-white" : "bg-stone-100 text-stone-600"
+                        isActive 
+                          ? "bg-[#5A8B7D] text-white" 
+                          : isLocked 
+                          ? "bg-stone-200 text-stone-500" 
+                          : "bg-stone-100 text-stone-600"
                       }`}>
                         <Icon className="w-4 h-4" />
                       </div>
-                      <div>
-                        <div className="text-sm font-semibold">{item.label}</div>
-                        <div className="text-xs text-stone-500 font-normal mt-0.5">{item.desc}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold flex items-center justify-between gap-1">
+                          <span className="truncate">{item.label}</span>
+                          {isLocked && (
+                            <span className="text-[10px] bg-stone-200 text-stone-600 font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
+                              <Lock className="w-3 h-3 text-stone-500" />
+                              Sign-in
+                            </span>
+                          )}
+                          {isFamilyMatch && unreadCount > 0 && (
+                            <span className="text-[10px] bg-rose-500 text-white font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0 animate-pulse">
+                              <MessageSquare className="w-3 h-3" />
+                              {unreadCount} New
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-stone-500 font-normal mt-0.5 truncate">{item.desc}</div>
                       </div>
                     </button>
                   );
@@ -194,6 +305,27 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Drawer Footer */}
             <div className="p-5 border-t border-stone-100 bg-stone-50/50 space-y-3">
+              {currentUser ? (
+                <button
+                  onClick={handleSignOutClick}
+                  className="w-full py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                >
+                  <LogOut className="w-4 h-4 text-rose-700" />
+                  <span>Sign Out</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onOpenAuthModal();
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Sign In / Sign Up</span>
+                </button>
+              )}
+
               <div className="bg-[#E9C46A]/20 p-3 rounded-2xl border border-[#E9C46A]/40 text-xs text-[#937217] flex items-center gap-2">
                 <Sparkles className="w-4 h-4 shrink-0" />
                 <span>"With hardship comes ease" • Quran 94:6</span>
@@ -205,5 +337,3 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-
-

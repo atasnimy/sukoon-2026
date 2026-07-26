@@ -46,8 +46,14 @@ How can I comfort or guide your family today?`,
   const [customApiKey, setCustomApiKey] = useState("");
   const [showApiSnippet, setShowApiSnippet] = useState(false);
   const [copiedSnippet, setCopiedSnippet] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [activeSpeakingId, setActiveSpeakingId] = useState<string | null>(null);
+
+  const isAdmin = Boolean(
+    userProfile?.role === "admin" ||
+    userProfile?.email?.toLowerCase().includes("adam") ||
+    userProfile?.parentName?.toLowerCase().includes("adam")
+  );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -341,19 +347,21 @@ async function askGeminiScholar(apiKey, userQuestion) {
             <span className="hidden sm:inline">{isMuted ? "Voice Off" : "Voice On"}</span>
           </button>
 
-          <button
-            onClick={() => setShowApiSnippet(!showApiSnippet)}
-            className="bg-[#E9C46A]/20 hover:bg-[#E9C46A]/30 text-[#937217] border border-[#E9C46A]/40 p-2.5 px-3 rounded-2xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs"
-          >
-            <Code className="w-4 h-4 text-[#937217]" />
-            <span>Developer API Key Code</span>
-            {showApiSnippet ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setShowApiSnippet(!showApiSnippet)}
+              className="bg-[#E9C46A]/20 hover:bg-[#E9C46A]/30 text-[#937217] border border-[#E9C46A]/40 p-2.5 px-3 rounded-2xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs"
+            >
+              <Code className="w-4 h-4 text-[#937217]" />
+              <span>Developer API Key Code</span>
+              {showApiSnippet ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+          )}
         </div>
       </div>
 
       {/* Expandable Developer API Snippet Panel */}
-      {showApiSnippet && (
+      {isAdmin && showApiSnippet && (
         <div className="glass-panel rounded-[32px] p-6 border border-[#E9C46A]/40 space-y-4 shadow-xl animate-in slide-in-from-top duration-200">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200/60 pb-3">
             <div>
