@@ -61,12 +61,7 @@ export const TabCommunityCircles: React.FC<TabCommunityCirclesProps> = ({
   const [newTagsStr, setNewTagsStr] = useState<string>("sensory, support, playgroup");
   const [isCreating, setIsCreating] = useState<boolean>(false);
 
-  const isAdmin = Boolean(
-    userProfile?.role === "admin" ||
-    !userProfile?.role ||
-    userProfile?.email?.toLowerCase().includes("adam") ||
-    userProfile?.parentName?.toLowerCase().includes("adam")
-  );
+  const isAdmin = userProfile?.role === "admin";
 
   const handleCreateCircleClick = () => {
     if (isAdmin) {
@@ -275,14 +270,16 @@ export const TabCommunityCircles: React.FC<TabCommunityCirclesProps> = ({
           </p>
         </div>
 
-        {/* Create Circle Button */}
-        <button
-          onClick={handleCreateCircleClick}
-          className="bg-[#3A5D54] hover:bg-[#2e4a43] text-white font-bold px-5 py-3 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shrink-0 cursor-pointer"
-        >
-          <Plus className="w-4 h-4 text-[#E9C46A]" />
-          <span>+ Create Community Circle</span>
-        </button>
+        {/* Create Circle Button - Only visible to Admins */}
+        {isAdmin && (
+          <button
+            onClick={handleCreateCircleClick}
+            className="bg-[#3A5D54] hover:bg-[#2e4a43] text-white font-bold px-5 py-3 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shrink-0 cursor-pointer"
+          >
+            <Plus className="w-4 h-4 text-[#E9C46A]" />
+            <span>+ Create Community Circle</span>
+          </button>
+        )}
       </div>
 
       {/* Main Container */}

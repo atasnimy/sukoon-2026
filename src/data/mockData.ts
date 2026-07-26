@@ -8,7 +8,7 @@ import {
 
 export const initialUserProfile: FamilyProfile = {
   id: "user_001",
-  role: "admin",
+  role: "user",
   parentName: "Mariam & Yusuf",
   childAge: "6-9",
   supportNeeds: ["Autism", "Sensory Sensitivity", "Non-verbal"],

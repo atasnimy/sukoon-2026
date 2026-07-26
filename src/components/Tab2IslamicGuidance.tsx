@@ -36,13 +36,7 @@ export const Tab2IslamicGuidance: React.FC<Tab2Props> = ({ sensoryMode, currentU
   const [showAdminRequiredModal, setShowAdminRequiredModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const isAdmin = Boolean(
-    userProfile?.role === "admin" ||
-    !userProfile?.role ||
-    userProfile?.role !== "user" ||
-    userProfile?.email?.toLowerCase().includes("adam") ||
-    userProfile?.parentName?.toLowerCase().includes("adam")
-  );
+  const isAdmin = userProfile?.role === "admin";
 
   const handleCreateRecordClick = () => {
     if (isAdmin) {
@@ -146,14 +140,16 @@ export const Tab2IslamicGuidance: React.FC<Tab2Props> = ({ sensoryMode, currentU
           </p>
         </div>
 
-        {/* Create Community Record Action */}
-        <button
-          onClick={handleCreateRecordClick}
-          className="bg-[#3A5D54] hover:bg-[#2e4a43] text-white font-bold px-5 py-3 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shrink-0 cursor-pointer"
-        >
-          <Plus className="w-4 h-4 text-[#E9C46A]" />
-          <span>+ Create Guidance Record</span>
-        </button>
+        {/* Create Community Record Action - Only visible to Admins */}
+        {isAdmin && (
+          <button
+            onClick={handleCreateRecordClick}
+            className="bg-[#3A5D54] hover:bg-[#2e4a43] text-white font-bold px-5 py-3 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shrink-0 cursor-pointer"
+          >
+            <Plus className="w-4 h-4 text-[#E9C46A]" />
+            <span>+ Create Guidance Record</span>
+          </button>
+        )}
       </div>
 
       {/* CATEGORIZED ACCORDION FAQ */}

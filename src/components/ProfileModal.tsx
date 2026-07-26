@@ -68,7 +68,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [languages, setLanguages] = useState<string[]>(profile.languages);
   const [interests, setInterests] = useState<string[]>(profile.interests);
   const [isLocationPrivate, setIsLocationPrivate] = useState<boolean>(profile.isLocationPrivate);
-  const [role, setRole] = useState<"admin" | "user">(profile.role || "admin");
+  const [role, setRole] = useState<"admin" | "user">(profile.role || "user");
 
   useEffect(() => {
     if (isOpen) {
@@ -81,7 +81,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       setLanguages(profile.languages);
       setInterests(profile.interests);
       setIsLocationPrivate(profile.isLocationPrivate);
-      setRole(profile.role || "admin");
+      setRole(profile.role || "user");
       setIsEditing(false);
       setShowSaveToast(false);
     }
@@ -115,6 +115,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    // Only existing admins can maintain admin role; non-admins cannot escalate
+    const finalRole: "admin" | "user" = profile.role === "admin" ? role : "user";
     const updated: FamilyProfile = {
       ...profile,
       parentName,
@@ -126,7 +128,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       languages,
       interests,
       isLocationPrivate,
-      role
+      role: finalRole
     };
 
     onSaveProfile(updated);
@@ -387,18 +389,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       Account Role & Access Rights
                     </label>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                      <select
-                        value={role}
-                        onChange={(e) => setRole(e.target.value as "admin" | "user")}
-                        className="p-2 rounded-lg border border-amber-300 bg-white font-bold text-xs text-amber-900 focus:ring-2 focus:ring-[#5A8B7D] shrink-0 cursor-pointer"
-                      >
-                        <option value="admin">🛡️ Sukoon Administrator</option>
-                        <option value="user">👤 Member Account</option>
-                      </select>
+                      {profile.role === "admin" ? (
+                        <div className="p-2 rounded-lg border border-amber-300 bg-amber-100 font-bold text-xs text-amber-900 shrink-0">
+                          🛡️ Sukoon Administrator
+                        </div>
+                      ) : (
+                        <div className="p-2 rounded-lg border border-stone-300/80 bg-stone-100 font-bold text-xs text-stone-700 shrink-0">
+                          👤 Member Account
+                        </div>
+                      )}
                       <span className="text-[11px] text-amber-800 font-medium">
-                        {role === "admin"
+                        {profile.role === "admin"
                           ? "Admins can create and remove Community Circles, Community Centers, and Islamic Fiqh Guidance records."
-                          : "Regular members can join community circles and connect with families."}
+                          : "Regular members can join community circles and connect with families. Administrator rights are strictly assigned by existing Administrators."}
                       </span>
                     </div>
                   </div>

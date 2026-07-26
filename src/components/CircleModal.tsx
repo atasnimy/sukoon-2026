@@ -38,13 +38,7 @@ export const CircleModal: React.FC<CircleModalProps> = ({
   const [newPostText, setNewPostText] = useState("");
   const [isPosting, setIsPosting] = useState(false);
 
-  const isAdmin = Boolean(
-    userProfile?.role === "admin" ||
-    !userProfile?.role ||
-    userProfile?.role !== "user" ||
-    userProfile?.email?.toLowerCase().includes("adam") ||
-    userProfile?.parentName?.toLowerCase().includes("adam")
-  );
+  const isAdmin = userProfile?.role === "admin";
 
   const handleDelete = () => {
     if (!onDeleteCircle) return;
