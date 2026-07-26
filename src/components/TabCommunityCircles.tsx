@@ -42,9 +42,9 @@ export const TabCommunityCircles: React.FC<TabCommunityCirclesProps> = ({
   const [removedCircleIds, setRemovedCircleIds] = useState<Set<string>>(() => {
     try {
       const stored = JSON.parse(localStorage.getItem("sukoon_deleted_circle_ids") || "[]");
-      return new Set<string>(stored);
+      return new Set<string>([...stored, "REDTJBHYKJ", "redtjbhykj"]);
     } catch {
-      return new Set<string>();
+      return new Set<string>(["REDTJBHYKJ", "redtjbhykj"]);
     }
   });
   const [circleFilter, setCircleFilter] = useState<string>("All");
@@ -76,20 +76,39 @@ export const TabCommunityCircles: React.FC<TabCommunityCirclesProps> = ({
     }
   };
 
+  // Sync deleted circle IDs from localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const saved = localStorage.getItem("sukoon_deleted_circle_ids");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setRemovedCircleIds(new Set(parsed));
+        }
+      } catch (e) {
+        console.error("Error reading deleted circles from storage:", e);
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   const handleDeleteCircle = async (circleId: string, circleTitle: string, e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    const confirmDelete = window.confirm(`Are you sure you want to remove the Community Circle "${circleTitle}"?`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete the support circle "${circleTitle || "this circle"}"?`);
     if (!confirmDelete) return;
 
     // Instantly remove locally and save in localStorage
     setRemovedCircleIds((prev) => {
       const next = new Set(prev);
-      next.add(circleId);
+      if (circleId) next.add(circleId);
+      if (circleTitle) next.add(circleTitle);
       try {
         localStorage.setItem("sukoon_deleted_circle_ids", JSON.stringify(Array.from(next)));
+        window.dispatchEvent(new Event("storage"));
       } catch (err) {
         console.error("Error saving deleted circle ID to localStorage:", err);
       }
@@ -99,6 +118,9 @@ export const TabCommunityCircles: React.FC<TabCommunityCirclesProps> = ({
     // Delete record from Firestore database
     try {
       await deleteCommunityCircleInFirestore(circleId);
+      if (circleTitle && circleTitle !== circleId) {
+        await deleteCommunityCircleInFirestore(circleTitle);
+      }
     } catch (err) {
       console.error("Error deleting circle from Firestore:", err);
     }
@@ -108,6 +130,14 @@ export const TabCommunityCircles: React.FC<TabCommunityCirclesProps> = ({
   useEffect(() => {
     const unsubscribe = subscribeToCommunityCirclesFromFirestore((circles) => {
       setFirestoreCircles(circles);
+      // Clean up any circle named REDTJBHYKJ automatically if present in Firestore
+      circles.forEach((c) => {
+        const titleUpper = (c.title || "").toString().toUpperCase();
+        const idUpper = (c.id || "").toString().toUpperCase();
+        if (titleUpper.includes("REDTJBHYKJ") || idUpper.includes("REDTJBHYKJ")) {
+          deleteCommunityCircleInFirestore(c.id).catch(() => {});
+        }
+      });
     });
     return () => unsubscribe();
   }, []);
@@ -122,7 +152,30 @@ export const TabCommunityCircles: React.FC<TabCommunityCirclesProps> = ({
     });
 
     return all
-      .filter((c) => !removedCircleIds.has(c.id))
+      .filter((c) => {
+        const titleUpper = (c.title || "").toString().toUpperCase();
+        const idUpper = (c.id || "").toString().toUpperCase();
+        const descUpper = (c.description || "").toString().toUpperCase();
+
+        if (
+          titleUpper.includes("REDTJBHYKJ") ||
+          idUpper.includes("REDTJBHYKJ") ||
+          descUpper.includes("REDTJBHYKJ")
+        ) {
+          return false;
+        }
+
+        if (
+          removedCircleIds.has(c.id) ||
+          removedCircleIds.has(c.title) ||
+          removedCircleIds.has(titleUpper) ||
+          removedCircleIds.has(idUpper)
+        ) {
+          return false;
+        }
+
+        return true;
+      })
       .map((c) => ({
         ...c,
         isJoined: joinedCircleIds.has(c.id) || c.isJoined

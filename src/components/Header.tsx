@@ -15,7 +15,8 @@ import {
   LogIn,
   LogOut,
   Lock,
-  MessageSquare
+  MessageSquare,
+  HeartHandshake
 } from "lucide-react";
 import { FamilyProfile } from "../types";
 import { CustomAuthUser, logoutUser } from "../lib/firebase";
@@ -49,10 +50,11 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems = [
     { id: 0, label: "Home", icon: Home, desc: "Overview & Sanctuary" },
-    { id: 1, label: "Family Match", icon: Users, desc: "Connect with nearby families" },
-    { id: 2, label: "Community Circles", icon: UserCheck, desc: "Support topics & discussions" },
-    { id: 3, label: "Masjid & Rulings", icon: BookOpenCheck, desc: "Fiqh guidance & accommodations" },
-    { id: 4, label: "AI Companion", icon: Bot, desc: "Scholar-backed answers & comfort" },
+    { id: 1, label: "Find Caregivers", icon: HeartHandshake, desc: "Trusted special needs families" },
+    { id: 2, label: "Family Match", icon: Users, desc: "Connect with nearby families" },
+    { id: 3, label: "Community Circles", icon: UserCheck, desc: "Support topics & discussions" },
+    { id: 4, label: "Masjid & Rulings", icon: BookOpenCheck, desc: "Fiqh guidance & accommodations" },
+    { id: 5, label: "AI Companion", icon: Bot, desc: "Scholar-backed answers & comfort" },
   ];
 
   const handleSelectTab = (tabId: number) => {
@@ -89,9 +91,9 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="glass-header sticky top-0 z-40 transition-colors duration-300">
+    <header className="glass-header sticky top-0 z-40 bg-white border-b border-stone-200 shadow-xs transition-colors duration-300">
       {/* Top Banner Accent */}
-      <div className="bg-[#5A8B7D]/10 text-[#3A5D54] text-xs py-1.5 px-4 text-center font-medium flex items-center justify-center gap-2 border-b border-white/30">
+      <div className="bg-[#E8F3F1] text-[#3A5D54] text-xs py-1.5 px-4 text-center font-medium flex items-center justify-center gap-2 border-b border-stone-200/80">
         <Sparkles className="w-3.5 h-3.5 text-[#937217] shrink-0" />
         <span>
           A compassionate, sensory-friendly sanctuary for special needs Muslim families
@@ -103,20 +105,20 @@ export const Header: React.FC<HeaderProps> = ({
         </span>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
         <div className="flex items-center justify-between gap-4">
           {/* Logo & Title - clickable to go Home */}
           <button 
             onClick={() => handleSelectTab(0)}
-            className="flex items-center gap-3 text-left hover:opacity-95 transition-opacity cursor-pointer"
+            className="flex items-center gap-3 text-left hover:opacity-95 transition-opacity cursor-pointer shrink-0"
           >
-            <div className="w-10 h-10 rounded-full bg-[#5A8B7D] flex items-center justify-center shadow-md shadow-[#5A8B7D]/20 shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#5A8B7D] flex items-center justify-center shadow-sm shadow-[#5A8B7D]/20 shrink-0">
               <Heart className="w-5 h-5 text-white fill-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-bold text-[#3A5D54] tracking-tight">
-                  Sukoon Community
+                  Sukoon
                 </h1>
                 <span className="bg-[#E9C46A]/25 text-[#937217] text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-[#E9C46A]/40">
                   سُكُون
@@ -125,8 +127,39 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </button>
 
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1 bg-stone-100/80 p-1 rounded-2xl border border-stone-200">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              const isLocked = item.id > 0 && !currentUser;
+              const isFamilyMatch = item.id === 2;
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleSelectTab(item.id)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                    isActive
+                      ? "bg-[#3A5D54] text-white shadow-xs"
+                      : "text-stone-700 hover:bg-white hover:text-stone-900"
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-200" : "text-stone-500"}`} />
+                  <span>{item.label}</span>
+                  {isLocked && <Lock className="w-3 h-3 text-stone-400 ml-0.5" />}
+                  {isFamilyMatch && unreadCount > 0 && (
+                    <span className="bg-rose-500 text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ml-1 animate-pulse">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
           {/* Right Section Controls: Auth Sign-In / Sign Out Button, Sensory Toggle, Profile */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Sign In / Sign Out Button */}
             {currentUser ? (
               <button
@@ -154,7 +187,7 @@ export const Header: React.FC<HeaderProps> = ({
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 border ${
                 sensoryMode
                   ? "bg-[#E9C46A]/30 text-[#937217] border-[#E9C46A]/60 shadow-xs font-semibold"
-                  : "bg-white/70 text-stone-600 border-white/80 hover:bg-white hover:text-[#5A8B7D]"
+                  : "bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200 hover:text-[#5A8B7D]"
               }`}
               title="Toggle calm sensory-friendly visual style"
             >
@@ -165,7 +198,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Profile Button */}
             <button
               onClick={handleProfileClick}
-              className="bg-white/80 hover:bg-white text-stone-800 border border-stone-200/80 rounded-full px-3 py-1.5 text-xs font-medium flex items-center gap-2 transition-all shadow-xs hover:ring-2 hover:ring-[#5A8B7D]/40 cursor-pointer"
+              className="bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 rounded-full px-3 py-1.5 text-xs font-medium flex items-center gap-2 transition-all shadow-xs cursor-pointer"
               title={currentUser ? "Click to view & edit your family profile" : "Sign in to create or view your profile"}
             >
               {currentUser ? (
@@ -173,7 +206,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <div className="w-6 h-6 rounded-full bg-[#E9C46A]/40 border border-white flex items-center justify-center text-[#937217] font-extrabold text-[11px]">
                     {userProfile.parentName.charAt(0) || "U"}
                   </div>
-                  <div className="text-left hidden lg:block">
+                  <div className="text-left hidden xl:block">
                     <div className="text-[11px] font-bold text-stone-800 leading-none truncate max-w-[100px]">
                       {userProfile.parentName}
                     </div>
@@ -187,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <div className="w-6 h-6 rounded-full bg-stone-200/90 border border-stone-300 flex items-center justify-center text-stone-600">
                     <UserIcon className="w-3.5 h-3.5" />
                   </div>
-                  <div className="text-left hidden lg:block">
+                  <div className="text-left hidden xl:block">
                     <div className="text-[11px] font-bold text-stone-700 leading-none">
                       Guest / Account
                     </div>
@@ -202,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Hamburger Button */}
             <button
               onClick={() => setIsMenuOpen(true)}
-              className="bg-[#5A8B7D] hover:bg-[#4a7569] text-white px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all shadow-md cursor-pointer ml-1 relative"
+              className="bg-[#5A8B7D] hover:bg-[#4a7569] text-white px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all shadow-md cursor-pointer ml-1 relative lg:hidden"
               aria-label="Open Navigation Menu"
             >
               <Menu className="w-4 h-4" />
@@ -256,7 +289,7 @@ export const Header: React.FC<HeaderProps> = ({
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
                   const isLocked = item.id > 0 && !currentUser;
-                  const isFamilyMatch = item.id === 1;
+                  const isFamilyMatch = item.id === 2;
 
                   return (
                     <button

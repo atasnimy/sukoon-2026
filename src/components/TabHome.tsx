@@ -62,7 +62,7 @@ export const TabHome: React.FC<TabHomeProps> = ({ onNavigateTab, sensoryMode }) 
           </button>
 
           <button
-            onClick={() => onNavigateTab(4)}
+            onClick={() => onNavigateTab(5)}
             className={`font-semibold rounded-2xl flex items-center gap-2 transition-all ${
               sensoryMode
                 ? "bg-stone-200 text-stone-950 text-lg px-6 py-4 border-2 border-stone-900"
@@ -81,10 +81,36 @@ export const TabHome: React.FC<TabHomeProps> = ({ onNavigateTab, sensoryMode }) 
           Explore the Sukoon Sanctuary
         </h3>
 
-        <div className={`grid grid-cols-1 ${sensoryMode ? "gap-6" : "sm:grid-cols-2 lg:grid-cols-4 gap-4"}`}>
-          {/* Pillar 1 */}
+        <div className={`grid grid-cols-1 ${sensoryMode ? "gap-6" : "sm:grid-cols-2 lg:grid-cols-5 gap-4"}`}>
+          {/* Pillar 1: Find Caregivers */}
           <button
             onClick={() => onNavigateTab(1)}
+            className={`text-left rounded-3xl p-5 transition-all flex flex-col justify-between ${
+              sensoryMode
+                ? "bg-white border-2 border-stone-800 space-y-3 p-6"
+                : "glass-card border border-white/80 hover:border-[#5A8B7D] space-y-3 shadow-sm hover:shadow-md"
+            }`}
+          >
+            <div className="w-10 h-10 rounded-2xl bg-[#3A5D54]/10 text-[#3A5D54] flex items-center justify-center font-bold">
+              <HandHeart className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className={`font-bold text-stone-900 ${sensoryMode ? "text-xl" : "text-base"}`}>
+                Trusted Caregivers
+              </h4>
+              <p className={`text-stone-600 mt-1 ${sensoryMode ? "text-base leading-relaxed" : "text-xs"}`}>
+                Find vetted caregivers experienced with special needs and Islamic values.
+              </p>
+            </div>
+            <span className="text-xs font-bold text-[#3A5D54] flex items-center gap-1 pt-2">
+              <span>Find Caregivers</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </button>
+
+          {/* Pillar 2: Family Matchmaker */}
+          <button
+            onClick={() => onNavigateTab(2)}
             className={`text-left rounded-3xl p-5 transition-all flex flex-col justify-between ${
               sensoryMode
                 ? "bg-white border-2 border-stone-800 space-y-3 p-6"
@@ -108,9 +134,9 @@ export const TabHome: React.FC<TabHomeProps> = ({ onNavigateTab, sensoryMode }) 
             </span>
           </button>
 
-          {/* Pillar 2 */}
+          {/* Pillar 3 */}
           <button
-            onClick={() => onNavigateTab(2)}
+            onClick={() => onNavigateTab(3)}
             className={`text-left rounded-3xl p-5 transition-all flex flex-col justify-between ${
               sensoryMode
                 ? "bg-white border-2 border-stone-800 space-y-3 p-6"
@@ -134,9 +160,9 @@ export const TabHome: React.FC<TabHomeProps> = ({ onNavigateTab, sensoryMode }) 
             </span>
           </button>
 
-          {/* Pillar 3 */}
+          {/* Pillar 4 */}
           <button
-            onClick={() => onNavigateTab(3)}
+            onClick={() => onNavigateTab(4)}
             className={`text-left rounded-3xl p-5 transition-all flex flex-col justify-between ${
               sensoryMode
                 ? "bg-white border-2 border-stone-800 space-y-3 p-6"
@@ -160,9 +186,9 @@ export const TabHome: React.FC<TabHomeProps> = ({ onNavigateTab, sensoryMode }) 
             </span>
           </button>
 
-          {/* Pillar 4 */}
+          {/* Pillar 5 */}
           <button
-            onClick={() => onNavigateTab(4)}
+            onClick={() => onNavigateTab(5)}
             className={`text-left rounded-3xl p-5 transition-all flex flex-col justify-between ${
               sensoryMode
                 ? "bg-white border-2 border-stone-800 space-y-3 p-6"

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Header } from "./components/Header";
 import { TabHome } from "./components/TabHome";
 import { Tab1FamilyMatching } from "./components/Tab1FamilyMatching";
+import { TabCaregivers } from "./components/TabCaregivers";
 import { TabCommunityCircles } from "./components/TabCommunityCircles";
 import { Tab2IslamicGuidance } from "./components/Tab2IslamicGuidance";
 import { Tab3AICompanion } from "./components/Tab3AICompanion";
@@ -134,13 +135,13 @@ export default function App() {
       preferredMode: "Chat",
       matchScore: 100,
       matchingCriteria: ["Direct Message Received"],
-      bio: "Registered Sukoon community member family.",
+      bio: "Registered Sukoon family.",
       avatarInitials: msg.senderName.slice(0, 2).toUpperCase() || "SF",
       bgGradient: "from-[#5A8B7D] to-[#3A5D54]"
     };
 
     setSelectedConnectFamily(familyToConnect);
-    setActiveTab(1); // Go to Family Match
+    setActiveTab(2); // Go to Family Match
     setIncomingNotification(null);
     setUnreadCount(0);
   };
@@ -234,6 +235,16 @@ export default function App() {
         )}
 
         {activeTab === 1 && (
+          <TabCaregivers
+            sensoryMode={sensoryMode}
+            onNavigateTab={(tab) => handleNavigateTab(tab)}
+            onOpenAiWithPrompt={() => {
+              handleNavigateTab(5);
+            }}
+          />
+        )}
+
+        {activeTab === 2 && (
           <Tab1FamilyMatching
             userProfile={userProfile}
             onOpenConnectModal={(fam) => setSelectedConnectFamily(fam)}
@@ -242,7 +253,7 @@ export default function App() {
           />
         )}
 
-        {activeTab === 2 && (
+        {activeTab === 3 && (
           <TabCommunityCircles
             onOpenCircleModal={(circle) => setSelectedCircle(circle)}
             sensoryMode={sensoryMode}
@@ -250,11 +261,11 @@ export default function App() {
           />
         )}
 
-        {activeTab === 3 && (
+        {activeTab === 4 && (
           <Tab2IslamicGuidance sensoryMode={sensoryMode} currentUser={currentUser} userProfile={userProfile} />
         )}
 
-        {activeTab === 4 && (
+        {activeTab === 5 && (
           <Tab3AICompanion userProfile={userProfile} sensoryMode={sensoryMode} />
         )}
       </main>
@@ -271,18 +282,21 @@ export default function App() {
         userProfile={userProfile}
         onClose={() => setSelectedCircle(null)}
         onToggleJoin={handleToggleJoinCircleFromModal}
-        onDeleteCircle={async (circleId) => {
+        onDeleteCircle={async (circleId, circleTitle) => {
           try {
             const stored = JSON.parse(localStorage.getItem("sukoon_deleted_circle_ids") || "[]");
-            if (!stored.includes(circleId)) {
-              stored.push(circleId);
-              localStorage.setItem("sukoon_deleted_circle_ids", JSON.stringify(stored));
-            }
+            if (!stored.includes(circleId)) stored.push(circleId);
+            if (circleTitle && !stored.includes(circleTitle)) stored.push(circleTitle);
+            localStorage.setItem("sukoon_deleted_circle_ids", JSON.stringify(stored));
+            window.dispatchEvent(new Event("storage"));
           } catch (err) {
             console.error(err);
           }
           setSelectedCircle(null);
           await deleteCommunityCircleInFirestore(circleId);
+          if (circleTitle && circleTitle !== circleId) {
+            await deleteCommunityCircleInFirestore(circleTitle);
+          }
         }}
       />
 
@@ -315,7 +329,7 @@ export default function App() {
               <div className="w-5 h-5 rounded-full bg-[#5A8B7D] flex items-center justify-center text-white">
                 <Heart className="w-3 h-3 fill-white" />
               </div>
-              <span>Sukoon Community • سُكُون</span>
+              <span>Sukoon • سُكُون</span>
             </div>
             <p className="text-stone-500 text-[11px] max-w-md">
               A compassionate digital sanctuary built for special needs Muslim families. Emphasizing scholarly Yusr (Ease), dignity, and peer solidarity.

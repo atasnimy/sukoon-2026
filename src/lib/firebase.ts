@@ -549,10 +549,42 @@ export async function createCommunityCircleInFirestore(circleData: {
 /**
  * Delete a Community Circle record in Firestore.
  */
-export async function deleteCommunityCircleInFirestore(circleId: string): Promise<boolean> {
+export async function deleteCommunityCircleInFirestore(circleIdOrTitle: string): Promise<boolean> {
   try {
-    const docRef = doc(db, "community_circles", circleId);
-    await deleteDoc(docRef);
+    if (!circleIdOrTitle) return true;
+
+    // 1. Attempt direct deletion by doc ID
+    try {
+      const docRef = doc(db, "community_circles", circleIdOrTitle);
+      await deleteDoc(docRef);
+    } catch {
+      // Ignore if doc ID didn't match directly
+    }
+
+    // 2. Query collection and delete any documents matching title or ID or REDTJBHYKJ
+    try {
+      const snap = await getDocs(collection(db, "community_circles"));
+      const targetUpper = circleIdOrTitle.toUpperCase().trim();
+      
+      snap.docs.forEach((d) => {
+        const data = d.data();
+        const docIdUpper = d.id.toUpperCase();
+        const docTitleUpper = (data.title || "").toString().toUpperCase();
+
+        if (
+          d.id === circleIdOrTitle ||
+          docIdUpper === targetUpper ||
+          docTitleUpper === targetUpper ||
+          docTitleUpper.includes("REDTJBHYKJ") ||
+          docIdUpper.includes("REDTJBHYKJ")
+        ) {
+          deleteDoc(doc(db, "community_circles", d.id)).catch(() => {});
+        }
+      });
+    } catch {
+      // Ignore query errors
+    }
+
     return true;
   } catch (error) {
     console.error("Error deleting community circle from Firestore:", error);

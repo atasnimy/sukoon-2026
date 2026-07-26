@@ -100,7 +100,7 @@ export const Tab1FamilyMatching: React.FC<Tab1Props> = ({
         nearbyMosque: p.nearbyMosque || "Local Mosque",
         distance: p.cityRegion || "Community Member",
         preferredMode: p.commMode || "In-person / Chat",
-        bio: `Registered Sukoon Community Member in ${p.cityRegion || "Local Area"}. Languages spoken: ${(p.languages || ["English"]).join(", ")}.`,
+        bio: `Registered Sukoon Member in ${p.cityRegion || "Local Area"}. Languages spoken: ${(p.languages || ["English"]).join(", ")}.`,
         matchScore: 90,
         matchingCriteria: [
           "Registered Sukoon Member",
@@ -108,6 +108,7 @@ export const Tab1FamilyMatching: React.FC<Tab1Props> = ({
         ],
         avatarInitials: (p.parentName || "F").charAt(0).toUpperCase(),
         bgGradient: "from-[#3A5D54] to-[#5A8B7D]",
+        languages: p.languages || ["English"],
         interests: p.interests || []
       });
     });

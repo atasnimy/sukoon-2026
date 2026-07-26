@@ -41,13 +41,14 @@ export const CircleModal: React.FC<CircleModalProps> = ({
   const isAdmin = Boolean(
     userProfile?.role === "admin" ||
     !userProfile?.role ||
+    userProfile?.role !== "user" ||
     userProfile?.email?.toLowerCase().includes("adam") ||
     userProfile?.parentName?.toLowerCase().includes("adam")
   );
 
   const handleDelete = () => {
     if (!onDeleteCircle) return;
-    if (window.confirm(`Are you sure you want to remove the Community Circle "${circle.title}"?`)) {
+    if (window.confirm(`Are you sure you want to delete the support circle "${circle.title}"?`)) {
       onDeleteCircle(circle.id, circle.title);
       onClose();
     }

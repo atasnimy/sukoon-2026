@@ -7,9 +7,10 @@ export type SupportNeed =
   | "Non-verbal" 
   | "Sensory Sensitivity" 
   | "Cerebral Palsy" 
-  | "Global Developmental Delay";
+  | "Global Developmental Delay"
+  | "Special Needs Community";
 
-export type CommMode = "Chat" | "Email" | "Video";
+export type CommMode = "Chat" | "Email" | "Video" | "In-person / Chat";
 
 export interface FamilyProfile {
   id: string;
@@ -93,4 +94,49 @@ export interface ChatMessage {
   timestamp: string;
   isFallback?: boolean;
   topicTag?: string;
+}
+
+export interface CaregiverReview {
+  id: string;
+  reviewerName: string;
+  date: string;
+  rating: number;
+  comment: string;
+  isVerifiedFamily?: boolean;
+}
+
+export interface CaregiverProfile {
+  id: string;
+  name: string;
+  title: string;
+  photoUrl?: string;
+  avatarInitials: string;
+  bgGradient: string;
+  location: string;
+  city: string;
+  zipCode: string;
+  distanceMiles: number;
+  yearsExperience: number;
+  hourlyRateMin: number;
+  hourlyRateMax: number;
+  rating: number;
+  reviewCount: number;
+  shortBio: string;
+  aboutMe: string;
+  experienceDetails: string;
+  gender: "Female" | "Male";
+  mode: "In-Person" | "Virtual" | "Both";
+  disabilitiesSupported: string[];
+  servicesProvided: string[];
+  languagesSpoken: string[];
+  availableDays: string[];
+  badges: string[];
+  certifications: string[];
+  reviews: CaregiverReview[];
+  availabilityGrid: {
+    day: string;
+    slots: string[];
+  }[];
+  phoneContact?: string;
+  emailContact?: string;
 }

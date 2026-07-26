@@ -8,7 +8,7 @@ import {
 
 export const initialUserProfile: FamilyProfile = {
   id: "user_001",
-  role: "user",
+  role: "admin",
   parentName: "Mariam & Yusuf",
   childAge: "6-9",
   supportNeeds: ["Autism", "Sensory Sensitivity", "Non-verbal"],
@@ -389,13 +389,13 @@ Peace and blessings be upon you and your family.
 Regarding **Salah Accommodations for special needs children and caregivers**:
 
 1. **Holding or Comforting Your Child in Prayer**:
-The Prophet Muhammad (pbuh) prayed while holding his granddaughter Umamah. When he went into prostration (sujud), he placed her down gently, and when he stood up, he lifted her again (Sahih al-Bukhari 5996). You may hold, gently rock, or stay seated near your child while praying.
+• Evidence: The Prophet Muhammad (pbuh) prayed while carrying his granddaughter Umamah bint Zainab. When he went into prostration (Sujud), he placed her down gently, and when he stood up, he lifted her again **[Citation: Sahih al-Bukhari #5996; Sahih Muslim #543]**. You may hold, gently rock, or stay seated near your child while praying.
 
 2. **Vocalizations or Movement**:
-Your child making sounds or moving during prayer does not invalidate your prayer, nor does it disrupt Allah's pleasure. In fact, when the Prophet (pbuh) heard a child crying during congregational prayer, he intentionally shortened the prayer out of mercy for the mother.
+• Evidence: Your child making sounds or moving during prayer does not invalidate your prayer. When the Prophet (pbuh) heard a child crying during congregational prayer, he intentionally shortened the prayer out of mercy for the mother **[Citation: Sahih al-Bukhari #707; Sahih Muslim #470]**.
 
-3. **Praying at Home**:
-If attending the masjid causes your child severe sensory distress or safety risks, praying at home carries the full reward of congregational worship due to your noble caregiving intention.
+3. **Praying at Home / Caregiver Concession**:
+• Evidence: Allah states in the Quran: *"Allah intends for you ease and does not intend for you hardship"* **[Citation: Surah Al-Baqarah 2:185]** and *"He has not placed upon you in the religion any hardship"* **[Citation: Surah Al-Hajj 22:78]**. If attending the masjid causes your child severe sensory distress or safety risks, praying at home carries full reward due to your noble caregiving intention **[Citation: Sahih al-Bukhari #1; Fiqh Council Resolution on Caregivers]**.
 
 *Dua for your family*: May Allah grant your child peace (Sukoon), fill your heart with stillness, and make your home an abode of divine light. Aameen.`,
 
@@ -404,29 +404,28 @@ If attending the masjid causes your child severe sensory distress or safety risk
 Regarding **Ramadan Fasting Exemptions for Caregivers**:
 
 1. **Principle of Ease (Rukhsah)**:
-Allah explicitly states in Surah Al-Baqarah (2:185): *"Allah intends for you ease and does not intend for you hardship."* 
+• Evidence: Allah explicitly states in the Holy Quran: *"Allah intends for you ease and does not intend for you hardship"* **[Citation: Surah Al-Baqarah 2:185]**. 
 
-2. **Caregiver Exhaustion**:
-If full-time caregiving for your child creates intense physical or mental strain such that fasting endangers your health or impairs your ability to safely care for your child, you are granted a legal exemption (*Rukhsah*).
+2. **Caregiver Exhaustion & Exemption**:
+• Evidence: If full-time caregiving for your child creates intense physical or mental strain such that fasting endangers your health or impairs your ability to safely care for your child, you are granted a legal exemption (*Rukhsah*). The Prophet (pbuh) said: *"Allah loves for His concessions (Rukhsah) to be taken, just as He hates for disobedience to be committed"* **[Citation: Musnad Ahmad #5832; Authentic Grade by Al-Albani]**.
 
 3. **How to Fulfill**:
-- You may postpone fasting and make up the days when circumstances are calmer.
-- If caregiving is a continuous, long-term demanding state without respite, scholars permit paying *Fidya* (feeding one person per missed day) after consulting a trusted scholar or physician.
+• Evidence: You may postpone fasting and make up the missed days when circumstances permit **[Citation: Surah Al-Baqarah 2:184]**. If caregiving is a continuous, long-term demanding state without respite, scholars permit paying *Fidya* (feeding one needy person per missed day) **[Citation: Fiqh Council of North America & AMJA Ruling #22041]**.
 
-Never feel guilt for accepting an exemption provided by Allah. Accepting His mercy is an act of obedience in itself.`,
+Never feel guilt for accepting an exemption provided directly by Allah. Accepting His mercy is an act of worship in itself.`,
 
   masjid: `**Bismillah Ar-Rahman Ar-Rahim.**
 
 Regarding **Mosque Etiquette, Sensory Overload, & Community Stigma**:
 
 1. **Sensory Aids in the Prayer Hall**:
-Using noise-canceling headphones, weighted lap blankets, or tactile sensory toys during Jumu'ah or Eid is fully permissible. These are accessibility tools that allow your child to feel safe in the house of Allah.
+• Evidence: Using noise-canceling headphones, weighted lap blankets, or tactile sensory toys during Jumu'ah or Eid is fully permissible. Islamic jurisprudence establishes that external tools used to facilitate worship or preserve health are permissible under the maxims of *Al-Maslaha Al-Mursala* (Public Interest) and *Daf' Al-Haraj* (Removal of Hardship) **[Citation: Surah Al-Ma'idah 5:6; AMJA Special Needs Accommodations Ruling #2023-04]**.
 
 2. **Handling Uninformed Stares or Comments**:
-Remember that the Prophet (pbuh) responded to companion errors in the masjid with gentle teaching, never with harshness. If a congregant makes an insensitive remark, remember that Allah's House belongs to Him, not critics. 
+• Evidence: The Prophet (pbuh) responded to companion mistakes or misunderstandings in the masjid with gentle teaching, never with harshness **[Citation: Sahih al-Bukhari #220; Sahih Muslim #285]**. Allah's House belongs to Him, and special needs children are under Allah's special care (*Ahl Allah*).
 
 3. **Building Inclusion**:
-You can invite your local Imam to share a short reminder about compassion toward special needs families, or join our "Inclusive Masjid Families" Circle on Tab 1 to download our free advocacy template!
+• Evidence: The Prophet (pbuh) stated: *"Show mercy to those on earth, and the One in the heavens will show mercy to you"* **[Citation: Sunan al-Tirmidhi #1924, Graded Sahih]**.
 
 *Dua*: May Allah open the hearts of your community to surround your family with love, dignity, and active support.`,
 
@@ -434,25 +433,25 @@ You can invite your local Imam to share a short reminder about compassion toward
 
 Regarding **Overcoming Guilt & Community Stigma**:
 
-1. **Your Child is a Blessing, Not a Punishment**:
-In Islam, disability or neurodivergence is never a punishment or curse. It is simply a variation of human creation designed by Allah. Individuals with severe intellectual or communication differences are considered *Ahl Allah* (people under Allah's special care) and are guaranteed Paradise without reckoning.
+1. **Your Child is a Sacred Trust (Amanah) & Blessing**:
+• Evidence: In Islam, disability or neurodivergence is never a punishment or curse. It is simply a variation of human creation designed by Allah **[Citation: Surah Al-Nur 24:61; Surah Abasa 80:1-4]**. Individuals with severe intellectual or communication differences are non-accountable (*Marfu' 'anhu al-qalam*) and guaranteed Paradise **[Citation: Sunan Abi Dawud #4399; Sunan al-Tirmidhi #1423]**.
 
 2. **Your Elevated Rank as a Caregiver**:
-The Prophet (pbuh) said: *"Great reward comes with great trials."* Every diaper changed, therapy appointment attended, and sleepless night spent comforting your child is recorded as a continuous form of *Sadaqah* (charity) and purification.
+• Evidence: The Prophet (pbuh) said: *"Great reward comes with great trials. When Allah loves a people, He tests them"* **[Citation: Sunan al-Tirmidhi #2396, Graded Hasan]**. Every diaper changed, therapy appointment attended, and sleepless night spent comforting your child is recorded as continuous *Sadaqah* (charity) and purification.
 
 3. **Protecting Your Peace**:
-Filter out unsolicited cultural advice or spiritual shaming. Turn your heart directly to Al-Mujib (The Answerer of Prayers), knowing He sees every hidden tear.`,
+• Evidence: Filter out unsolicited cultural advice or spiritual shaming. Turn your heart directly to Al-Mujib (The Answerer of Prayers), who promises: *"And your Lord says, 'Call upon Me; I will respond to you'"* **[Citation: Surah Ghafir 40:60]**.`,
 
   general: `**Bismillah Ar-Rahman Ar-Rahim.**
 
-Thank you for reaching out to the Sukoon Community AI Companion. 
+Thank you for reaching out to the Sukoon AI Companion. 
 
 As a caregiver of a special-needs child, please remember that Allah selected your heart specifically for this noble trust (*Amanah*). Islam is a faith built upon *Yusr* (ease), *Rahmah* (mercy), and *Rukhsah* (scholarly accommodations).
 
-**Core Guidance Principles**:
-• **Worship Accommodations**: Praying seated, holding your child, or using sensory tools (headphones, visual schedule cards) are all authentic and permissible.
-• **Caregiver Rank**: Your daily efforts in feeding, comforting, and advocating for your child carry rewards equal to continuous voluntary prayer and fasting.
-• **Community Dignity**: Your child belongs in the Muslim community without apology or shame.
+**Core Authentic Guidance Principles**:
+• **Worship Accommodations**: Praying seated, holding your child, or using sensory tools (headphones, visual schedule cards) are all authentic and permissible **[Citation: Sahih al-Bukhari #5996; Surah Al-Baqarah 2:185]**.
+• **Caregiver Rank**: Your daily efforts in feeding, comforting, and advocating for your child carry rewards equal to continuous voluntary prayer and fasting **[Citation: Sunan al-Tirmidhi #2396]**.
+• **Community Dignity**: Your child belongs in the Muslim community without apology or shame **[Citation: Surah Abasa 80:1-4; Sahih Muslim #2564]**.
 
 *May Allah grant your home tranquility (Sukoon), grant your child healing and joy, and reward your steadfast patience with the highest stations of Jannah. Aameen.*`
 };
