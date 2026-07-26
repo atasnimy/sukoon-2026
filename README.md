@@ -1,6 +1,8 @@
-## Project name: Sukoon Community
+## Project Name: Sukoon Community
 
-## Elevator pitch:
+## Elevator Pitch:
+
+## Project Story:
 
 ### Inspiration
 
@@ -21,3 +23,5 @@ Google API, Google AI Studio
 
 ## Video Demo Link:
 
+## Website Link:
+https://sukoon-community.ai.studio/
