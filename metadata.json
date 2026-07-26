@@ -1,0 +1,6 @@
+{
+  "name": "Sukoon Community",
+  "description": "A compassionate digital sanctuary and support hub for special needs Muslim families featuring smart family matching, Islamic guidance FAQ, and an AI Islamic Companion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #F9F8F4;
+    background-image: 
+      radial-gradient(circle at top right, #E8F3F1 0%, #F9F8F4 50%), 
+      radial-gradient(circle at bottom left, #F2E9D9 0%, #F9F8F4 50%);
+    background-attachment: fixed;
+    color: #292524;
+  }
+
+  body.sensory-active {
+    background-color: #FAF8F5 !important;
+    background-image: none !important;
+    color: #0F172A !important;
+    font-size: 17px !important;
+    line-height: 1.8 !important;
+  }
+}
+
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 20px 25px -5px rgba(229, 226, 218, 0.5), 0 8px 10px -6px rgba(229, 226, 218, 0.5);
+}
+
+body.sensory-active .glass-panel,
+body.sensory-active .glass-card,
+body.sensory-active .glass-header {
+  background-color: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 2px solid #1E293B !important;
+  box-shadow: none !important;
+}
+
+.glass-header {
+  background-color: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-card {
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
